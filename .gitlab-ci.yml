@@ -1,0 +1,64 @@
+stages:
+  - npm
+  - sonar
+  - trivy_file_scan
+  - docker
+  - trivy_image_scan
+  - run_container
+
+npm_install:
+  stage: npm    
+  image:
+    name: node:16
+  script:
+    - npm install    
+
+sonarqube-check:
+  stage: sonar
+  before_script:
+    - export SONAR_USER_HOME="${CI_PROJECT_DIR}/.sonar"
+    - export GIT_DEPTH="0"
+  image: 
+    name: sonarsource/sonar-scanner-cli:latest
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: 
+    - sonar-scanner
+  allow_failure: true
+  only:
+    - main
+
+trivy_file_scan:
+  stage: trivy_file_scan
+  image:
+    name: aquasec/trivy:latest
+  script:
+    - trivy fs .
+
+docker_build_and_push:
+  stage: docker
+  image:
+    name: docker:latest
+  services:
+    - docker:dind   
+  script:
+    - docker build --build-arg REACT_APP_RAPID_API_KEY=bc53060f4cmsh68e29e7cba3ad08p1de438jsnf535bfa93067 -t youtubeclone .  
+    - docker tag youtubeclone olaoyefaith/youtubeclone:latest
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - docker push olaoyefaith/youtubeclone:latest
+
+trivy_image_scan:
+  stage: trivy_image_scan
+  image:
+    name: aquasec/trivy:latest
+  script:
+    - trivy image olaoyefaith/youtubeclone:latest
+
+deploy:
+  stage: run_container
+  tags:
+    - youtube  # Use your own tags 
+  script:
+    - docker run -d --name youtube -p 3000:3000 olaoyefaith/youtubeclone:latest
