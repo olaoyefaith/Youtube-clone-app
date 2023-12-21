@@ -22,12 +22,14 @@ Before setting up the CI/CD pipeline, ensure you have the following in place:
 - Note the public IP address and SSH into the VM.
 
 ## GitLab CI/CD Variables
-Project-Level Variables
+![Alt text](images/GI.png)
+
+**Project-Level Variables**
 Navigate to Project Settings:
-Go to your GitLab project.
-Click on "Settings" > "CI / CD" > "Variables."
-Add Project-Level Variables:
-Add project-level variables such as DOCKER_USERNAME and DOCKER_PASSWORD to securely authenticate with Docker Hub during the Docker image push stage
+i.  Go to your GitLab project.
+ii. Click on "Settings" > "CI / CD" > "Variables."
+**Add Project-Level Variables:**
+iii. Add project-level variables such as DOCKER_USERNAME and DOCKER_PASSWORD to securely authenticate with Docker Hub during the Docker image push stage
 
  ![Alt text](images/crednetials.png)
 
